@@ -11,12 +11,22 @@
 			<uni-forms-item required label="兴趣爱好" name="hobby">
 				<uni-data-checkbox multiple v-model="formData.hobby" :localdata="hobby"/>
 			</uni-forms-item>
-			<uni-forms-item required label="图片" name="gridList">
+			<uni-forms-item required label="图片" name="gridImgList">
 				<view class="grid">
-					<sh-grid :gridType="1" :lists="formData.gridList" :vstyle="vstyle" :istyle="istyle" 
-					@addGridAction="addGridAction" 
-					@deleteGridAction="deleteGridAction"></sh-grid> 
+					<sh-grid :gridType="1" :lists="formData.gridImgList" :vstyle="vstyle" :istyle="istyle" 
+					@addGridAction="addImgGridAction" 
+					@deleteGridAction="deleteImgGridAction"></sh-grid> 
 				</view>
+			</uni-forms-item>
+			<uni-forms-item required label="视频" name="gridVideoList">
+				<view class="grid">
+					<sh-grid :gridType="1" :lists="formData.gridVideoList" :vstyle="vstyle" :istyle="istyle" 
+					@addGridAction="addVideoGridAction" 
+					@deleteGridAction="deleteVideoGridAction"></sh-grid> 
+				</view>
+			</uni-forms-item>
+			<uni-forms-item required label="文件" name="fileList">
+				<sh-upload :lists="formData.fileList"></sh-upload>
 			</uni-forms-item>
 		</uni-forms>
 		<button @click="submitForm">Submit</button>
@@ -31,7 +41,9 @@
 					name:'',
 					age:'',
 					hobby:'',
-					gridList:[],
+					gridImgList:[],
+					gridVideoList:[],
+					fileList:[],
 				},
 				hobby:[{'value':'0','text':'唱歌'},{'value':'1','text':'跳舞'}],
 				rules: {
@@ -60,7 +72,7 @@
 							}
 						}]
 					},
-					gridList: {
+					gridImgList: {
 						rules: [{
 							required: true,
 							errorMessage: '请添加图片',
@@ -72,7 +84,20 @@
 								return true
 							}
 						}]
-					}
+					},
+					gridVideoList: {
+						rules: [{
+							required: true,
+							errorMessage: '请添加视频',
+						},{
+							validateFunction:function(rule,value,data,callback){
+								if (value.length < 2) {
+									callback('请上传至少2个视频')
+								}
+								return true
+							}
+						}]
+					},
 				},
 				vstyle: {margin:'20rpx'},
 				istyle: {width:'144rpx',height:'144rpx','margin-bottom':'10rpx'},
@@ -89,7 +114,7 @@
 			},
 			imgAction() {
 				let that = this;
-				let count = that.formData.gridList.length == 0 ? that.maxImg : that.maxImg - that.formData.gridList.length;
+				let count = that.formData.gridImgList.length == 0 ? that.maxImg : that.maxImg - that.formData.gridImgList.length;
 			    if (count > 0) {
 					uni.chooseImage({
 						count: count , //默认9
@@ -98,7 +123,7 @@
 						success: function (res) {
 							 for (var i = 0; i < res.tempFilePaths.length;i++) {
 								 let file = res.tempFilePaths[i];
-								 that.formData.gridList.push({imgUrl:file})
+								 that.formData.gridImgList.push({imgUrl:file});
 							 }
 						}
 					}); 
@@ -110,13 +135,39 @@
 					});  
 				}
 			},
-			addGridAction() {
+			videoAction() {
+				let that = this;
+				let count = that.formData.gridVideoList.length == 0 ? that.maxImg : that.maxImg - that.formData.gridVideoList.length;
+			    if (count > 0) {
+					uni.chooseVideo({
+						sourceType: ['camera', 'album'],
+						success: function (res) {
+							that.formData.gridVideoList.push({videoUrl:res.tempFilePath,mediaType:1})
+						}
+					}); 
+				}else {
+					uni.showToast({
+						title: '删掉一些视频再新增',
+						duration: 2000,
+						icon: 'none'
+					});  
+				}
+			},
+			addImgGridAction() {
 				this.imgAction();
 			},
-			deleteGridAction(e) {
+			deleteImgGridAction(e) {
 				let index = e.index;
-				this.formData.gridList.splice(index,1);
-			}
+				this.formData.gridImgList.splice(index,1);
+			},
+			addVideoGridAction() {
+				this.videoAction();
+			},
+			deleteVideoGridAction(e) {
+				let index = e.index;
+				this.formData.gridVideoList.splice(index,1);
+			},
+		
 		}
 	}
 </script>

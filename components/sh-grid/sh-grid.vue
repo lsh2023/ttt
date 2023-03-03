@@ -1,7 +1,8 @@
 <template>
 	<view>
 		<view v-for="(item,index) in items" :key="index" class="left center relative" :style="viewStyle" @click="gridAction(item,index)">
-			<image :src="item.imgUrl" :data-src="item.imgUrl" mode="aspectFit" @error="errorImg($event,index)" class="block" :style="istyle">
+			<video v-if="item.mediaType == 1" :id="'sh-video-' + index" :src="item.videoUrl" :style="istyle" :controls="isPlay" :show-center-play-btn="false"></video>
+			<image v-else :src="item.imgUrl" mode="aspectFit" @error="errorImg($event,index)" class="block" :style="istyle">
 			<text :style="tstyle">{{item.text}}</text>
 			<image v-if="gridType == 1" src="/static/delete.png" mode="aspectFit" class="delete" @click.stop="delectAction(item,index)"></image>
 		</view>
@@ -41,7 +42,9 @@
 				items: null,
 				viewStyle: {},
 				imgStyle: {},
-				textStyle: {}
+				textStyle: {},
+				videoContext:null,
+				isPlay:false,
 			};
 		},
 		mounted() {
@@ -56,13 +59,25 @@
 			},
 			gridAction(item,index) {
 				if (this.gridType == 1) {
-					let imgList = this.items.map((obj)=>{
-						return obj.imgUrl
-					})
-					uni.previewImage({
-						current : index,
-						urls : imgList,
-					});
+					if (item.mediaType == 1) {
+						this.isPlay = !this.isPlay;
+						this.videoContext = uni.createVideoContext('sh-video-' + index ,this)
+						if (this.isPlay) {
+							this.videoContext.play();
+							this.videoContext.requestFullScreen();
+						}else {
+							this.videoContext.exitFullScreen();
+							this.videoContext.pause();
+						}
+					}else {
+						let imgList = this.items.map((obj)=>{
+							return obj.imgUrl
+						})
+						uni.previewImage({
+							current : index,
+							urls : imgList,
+						});
+					}
 				}
 				this.$emit('gridAction',{
 					detail:item,
