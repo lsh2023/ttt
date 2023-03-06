@@ -11,6 +11,9 @@
 			<uni-forms-item required label="兴趣爱好" name="hobby">
 				<uni-data-checkbox multiple v-model="formData.hobby" :localdata="hobby"/>
 			</uni-forms-item>
+			<uni-forms-item label="性别" required>
+				<uni-data-checkbox v-model="formData.sex" :localdata="sexs" />
+			</uni-forms-item>
 			<uni-forms-item required label="图片" name="gridImgList">
 				<view class="grid">
 					<sh-grid :gridType="1" :lists="formData.gridImgList" :vstyle="vstyle" :istyle="istyle" 
@@ -26,7 +29,7 @@
 				</view>
 			</uni-forms-item>
 			<uni-forms-item required label="文件" name="fileList">
-				<sh-upload :lists="formData.fileList"></sh-upload>
+				<sh-upload @fileList="fileListAction" :maxfile="maxFile" @preview="previewAction"></sh-upload>
 			</uni-forms-item>
 		</uni-forms>
 		<button @click="submitForm">Submit</button>
@@ -41,11 +44,13 @@
 					name:'',
 					age:'',
 					hobby:'',
+					sex:'',
 					gridImgList:[],
 					gridVideoList:[],
 					fileList:[],
 				},
 				hobby:[{'value':'0','text':'唱歌'},{'value':'1','text':'跳舞'}],
+				sexs:[{'value':'0','text':'女'},{'value':'1','text':'男'}],
 				rules: {
 					name: {
 						rules: [{
@@ -98,10 +103,25 @@
 							}
 						}]
 					},
+					fileList: {
+						rules: [{
+							required: true,
+							errorMessage: '请添加文件',
+						},{
+							validateFunction:function(rule,value,data,callback){
+								if (value.length < 2) {
+									callback('请上传至少2个文件')
+								}
+								return true
+							}
+						}]
+					}
 				},
 				vstyle: {margin:'20rpx'},
 				istyle: {width:'144rpx',height:'144rpx','margin-bottom':'10rpx'},
 				maxImg: 6,
+				maxVideo: 6,
+				maxFile: 6,
 			};
 		},
 		methods: {
@@ -137,7 +157,7 @@
 			},
 			videoAction() {
 				let that = this;
-				let count = that.formData.gridVideoList.length == 0 ? that.maxImg : that.maxImg - that.formData.gridVideoList.length;
+				let count = that.formData.gridVideoList.length == 0 ? that.maxVideo : that.maxVideo - that.formData.gridVideoList.length;
 			    if (count > 0) {
 					uni.chooseVideo({
 						sourceType: ['camera', 'album'],
@@ -152,6 +172,18 @@
 						icon: 'none'
 					});  
 				}
+			},
+			fileListAction(value) {
+				this.formData.fileList = value;
+			},
+			previewAction(item) { 
+				uni.navigateTo({
+					url: '/pages/preview/preview',
+					success: function(res) {
+						// 通过eventChannel向被打开页面传送数据
+						res.eventChannel.emit('previewObj', { data: item })
+					}
+				});
 			},
 			addImgGridAction() {
 				this.imgAction();
