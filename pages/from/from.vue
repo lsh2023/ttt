@@ -181,7 +181,7 @@
 					url: '/pages/preview/preview',
 					success: function(res) {
 						// 通过eventChannel向被打开页面传送数据
-						res.eventChannel.emit('previewObj', { data: item })
+						res.eventChannel.emit('previewObj', item);
 					}
 				});
 			},

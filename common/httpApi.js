@@ -118,7 +118,7 @@ var tokenReq = function() {
 			url: '/api/oauth/token?grant_type=client_credentials',
 			header: {
 				Authorization: 'Basic ZGluZ2RhbmcuZGFuZ3hpYS5jb206MDhmZDNiNzE5MzFjNDk3NWE4NGY4ZTQ5ODQ2NmVjMjE=',
-				scope: 'all'
+				scope: 'all',
 			},
 			method:'POST',
 		}).then((res) => {
@@ -133,7 +133,6 @@ var tokenReq = function() {
 			reject(err);
 		});
 	})
-	
 }
 
 var loginReq =  function() {
@@ -163,7 +162,6 @@ var loginReq =  function() {
 			reject(err);
 		});
 	})
-	
 }
 
 module.exports = {
@@ -174,5 +172,5 @@ module.exports = {
 	formPost,
 	tokenReq,
 	loginReq,
-	upload
+	upload,
 }

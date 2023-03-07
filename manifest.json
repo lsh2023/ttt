@@ -85,6 +85,12 @@
 				    "pathRewrite": {
 				        "^/apixm": ""
 				    }
+				},
+				"img": {
+				    "target": "https://sysimg.danxia.com",
+				    "pathRewrite": {
+				        "^/img": ""
+				    }
 				}
             }
         },
