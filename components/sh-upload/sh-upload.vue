@@ -13,12 +13,15 @@
 				</uni-col>
 			</uni-row>
 		</view>
-		<lsj-upload ref="lsj-upload" width="100%" height="80rpx" 
+		<lsj-upload ref="upload" width="100%" height="80rpx" 
 		:debug="true" 
 		:instantly="false" 
 		:formats="formats"
 		:count="maxfile"
-		@change="uploadChange">
+		:option="{}"
+		@change="uploadChange"
+		childId="upload-cid"
+		>
 		</lsj-upload>
 	</view>
 </template>
@@ -33,19 +36,32 @@
 			},
 			formats : { // 支持上传的格式 空字符串表示不限制
 				type : String,
-				default : 'doc,docx,xls,xlsx,ppt,pptx,pdf,txt'
+				default : 'doc,docx,xls,xlsx,ppt,pptx,pdf'
 			}
 		},
 		data() {
 			return {
 				items: null,
+				option:{
+					url:'',//上传接口地址
+					name:'photos',//上传接口文件key，默认为file
+					header:{},//上传接口请求头
+					formData:{},//上传接口额外参数
+				}
 			};
 		},
 		mounted() {
-			// https://ext.dcloud.net.cn/plugin?id=5459
+			let loginInfo = uni.getStorageSync('loginInfo');
+			let imgAuth = uni.getStorageSync('imgAuth');
+			let empNo = loginInfo.empNO;
+			this.option.url = '/img/api/files/uploadmulti?empid=' + empNo + '&folder=OA&city=XM';
+			this.option.header.Authorization = imgAuth;
+			// this.$refs.upload.setData('url','/img/api/files/uploadmulti?empid=' + empNo + '&folder=OA&city=XM');
+			// this.$refs.upload.setData('header.Authorization',imgAuth);
 		},
 		methods:{
 			uploadChange(e) {
+				let that = this;
 				this.items = [];
 				let uploadList = [...e.values()];
 				if (uploadList.length == 0) {
@@ -67,21 +83,34 @@
 						}else {
 							iconUrl = '/static/other.png';
 						}
-						this.items.push({
-							iconUrl:iconUrl,
-							fileName:fileName,
-							filePath:filePath,
-						});
+						 this.httpApi.upload({
+							 url:this.option.url,
+							 name:this.option.name,
+							 header:this.option.header,
+							 formData:this.option.formData,
+							 filePath:filePath
+						 }).then((res)=>{
+						 	 
+						 });
+						// this.items.push({
+						// 	iconUrl:iconUrl,
+						// 	fileName:fileName,
+						// 	filePath:filePath,
+						// });
 						if (i == uploadList.length - 1) {
-							this.$emit('fileList',this.items);
+							 this.$nextTick(()=>{
+								that.$emit('fileList',that.items);
+							 	that.$refs.upload.show(); // 重新定位覆盖层控件
+							 });
 						}
 					}
 				}
 			},
 			deleteAction (item,index) {
-				this.$refs['lsj-upload'].clear(item.fileName);
+				this.$refs['upload'].clear(item.fileName);
 			},
 			previewAction(item,index) {
+				console.log('预览按钮点击了');
 				this.$emit('preview',item);
 			}
 		}

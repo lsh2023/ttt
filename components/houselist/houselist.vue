@@ -2,33 +2,34 @@
 	<view>
 		<uni-list>
 			<uni-list-item v-for="(item,index) in items" :key="index">
-				<template v-slot:header>
-					<view class="house-header">
-						<image class="house-img"
-						:src="item.imgUrl" 
-						mode="aspectFit" @error="errorImg($event,index)">
-						</image>
-					</view>
-				</template>
 				<template v-slot:body>
-					<view class="house-body">
-						<view class="flex">
-							<text class="house-grade">{{ item.houseGrade == 2 ? 'A' : 'B' }}</text>
-							<text class="clamp inline-block">{{ '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈' }}</text>
+					<view class="house-body flex">
+						<view class="house-left">
+							<image class="house-img"
+							:src="item.imgUrl" 
+							mode="aspectFit" @error="errorImg($event,index)">
+							</image>
 						</view>
-						<text class="house-subtitle clamp block">{{ '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈' }}</text>
-						<view class="house-tags">
-							<view class="inline house-tag" v-for="(tag,tagIndex) in item.houseTags" :key="tagIndex">
-								<uni-tag :text="'xxxx'" class="inline-block" custom-style="background-color: #55aaff; border-color: #55aaff; color: #fff;"></uni-tag>
+						<view class="house-right">
+							<view class="flex">
+								<text class="house-grade">{{ item.houseGrade == 2 ? 'A' : 'B' }}</text>
+								<text class="clamp inline-block">{{ '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈' }}</text>
+							</view>
+							<text class="house-subtitle clamp block">{{ '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈' }}</text>
+							<view class="house-tags">
+								<view class="inline house-tag" v-for="(tag,tagIndex) in item.houseTags" :key="tagIndex">
+									<uni-tag :text="'xxxx'" class="inline-block" custom-style="background-color: #55aaff; border-color: #55aaff; color: #fff;"></uni-tag>
+								</view>
+							</view>
+							<view class="house-foot flex">
+								<view class="house-price">
+									<text class="price">{{1111}}</text>
+									<text class="unit">万元</text>
+								</view>
+								<text class="unit-price">{{1111 + '元/m'}}<sup>2</sup></text>
 							</view>
 						</view>
-						<view class="house-foot flex">
-							<view class="house-price">
-								<text class="price">{{1111}}</text>
-								<text class="unit">万元</text>
-							</view>
-							<text class="unit-price">{{1111 + '元/m'}}<sup>2</sup></text>
-						</view>
+						
 					</view>
 				</template>
 			</uni-list-item>
@@ -76,12 +77,12 @@
 </script>
 
 <style lang="scss">
-.house-img {
-	width: 244rpx;
-	height: 188rpx;
-}
 .house-body {
 	width: 100%;
+	.house-img {
+		width: 244rpx;
+		height: 188rpx;
+	}
 	.house-grade {
 		color: white;
 		background: red;

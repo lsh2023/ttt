@@ -42,8 +42,12 @@
             "path" : "pages/preview/preview",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "预览",
-                "enablePullDownRefresh": false
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"titleNView":false
+				}
             }
             
         }

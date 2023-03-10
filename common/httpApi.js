@@ -1,7 +1,18 @@
 import { isNullVal } from './util.js'
 
 var request = function(obj) {
-	var that = this;
+	if (process.env.NODE_ENV === 'development') {
+		// #ifndef H5
+			var url = obj.url;
+			if (url.indexOf('/api/') >= 0) {
+				obj.url = url.replace('/api/','https://dingdang.danxia.com/');
+			}else if (url.indexOf('/apixm/') >=0) {
+				obj.url = url.replace('/apixm/','https://dingdang.danxia.com/xm/')
+			}else if (url.indexOf('/img/') >= 0) {
+				obj.url = url.replace('/img/','https://sysimg.danxia.com/');
+			}
+		// #endif
+	}
 	return new Promise((resolve, reject) => {
 		uni.showLoading({
 			title: '加载中...',
@@ -39,7 +50,6 @@ var request = function(obj) {
 }
 
 var upload = function(obj) {
-	var that = this;
 	return new Promise((resolve, reject) => {
 		uni.showLoading({
 			title: '上传中...',
@@ -52,10 +62,12 @@ var upload = function(obj) {
 			formData:obj.formData,
 			header:obj.header,
 			success: (res) => {
+				console.log(res);
 				uni.hideLoading();
 				resolve(res);
 			},
 			fail: (err) => {
+				console.log(err);
 				uni.hideLoading();
 				reject(err);
 			}
@@ -97,10 +109,10 @@ var get = function(obj) {
 }
 
 var tokenRequest = function(obj) {
-	let authorization = uni.getStorageSync('authorization');
+	let auth = uni.getStorageSync('auth');
 	let loginInfo = uni.getStorageSync('loginInfo');
-	if (!isNullVal(authorization)) {
-		obj.header['Authorization'] = authorization;
+	if (!isNullVal(auth)) {
+		obj.header['Authorization'] = auth;
 	}
 	if (!isNullVal(loginInfo)) {
 		var accessToken = loginInfo.accessToken;
@@ -111,10 +123,37 @@ var tokenRequest = function(obj) {
 	return this.request(obj);
 }
 
+var imgTokenReq = function() {
+	let that = this;
+	return new Promise((resolve, reject) => {
+		that.request({
+			url: '/img/token',
+			header: {
+				Authorization: 'Basic ZGluZ2RhbmdzeXNpbWcuZGFueGlhLmNvbTpCNzYyNjEwRjQ0RUQ0QUE3OEY3QUUxM0M1NzI1NEI1Rg==',
+				'content-type': 'application/x-www-form-urlencoded',
+			},
+			data: {
+				grant_type:'client_credentials'
+			},
+			method:'POST',
+		}).then((res) => {
+			 let data = res.data;
+			 if (!isNullVal(data.access_token)) {
+			 	uni.setStorageSync('imgAuth','Bearer ' + data.access_token);
+			 	resolve(res);
+			 }else {
+			 	resolve(res);
+			 }
+		}).catch((err) => {
+			reject(err);
+		});
+	})
+}
+
 var tokenReq = function() {
 	let that = this;
 	return new Promise((resolve, reject) => {
-		this.request({
+		that.request({
 			url: '/api/oauth/token?grant_type=client_credentials',
 			header: {
 				Authorization: 'Basic ZGluZ2RhbmcuZGFuZ3hpYS5jb206MDhmZDNiNzE5MzFjNDk3NWE4NGY4ZTQ5ODQ2NmVjMjE=',
@@ -124,7 +163,7 @@ var tokenReq = function() {
 		}).then((res) => {
 			let data = res.data;
 			if (!isNullVal(data.access_token)) {
-				uni.setStorageSync('authorization','Bearer ' + data.access_token);
+				uni.setStorageSync('auth','Bearer ' + data.access_token);
 				resolve(res);
 			}else {
 				resolve(res);
@@ -173,4 +212,5 @@ module.exports = {
 	tokenReq,
 	loginReq,
 	upload,
+	imgTokenReq
 }

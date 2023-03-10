@@ -177,13 +177,45 @@
 				this.formData.fileList = value;
 			},
 			previewAction(item) { 
-				uni.navigateTo({
-					url: '/pages/preview/preview',
-					success: function(res) {
-						// 通过eventChannel向被打开页面传送数据
-						res.eventChannel.emit('previewObj', item);
-					}
-				});
+				// #ifndef H5
+					var fileType = '';
+				    // #ifdef MP-ALIPAY
+						fileType = 'pdf';
+				    // #endif
+					console.log(item.filePath);
+					
+					uni.downloadFile({
+						url: 'http://sysimg.danxia.com/xm/uploads/OA/202303/07/202303071542559495972586291kfcs2590.pdf',
+						success: function (res) {
+							var filePath = res.tempFilePath;
+							console.log(filePath);
+							uni.openDocument({
+								filePath:filePath,
+								fileType:fileType,
+								success:((res)=>{
+									
+								}),
+								fail:((err)=>{
+									
+								}),
+								complete:((finish)=>{
+									console.log(finish);
+								})
+							});
+						},
+					})
+					
+				
+				// #endif
+				// #ifdef H5
+					uni.navigateTo({
+						url: '/pages/preview/preview',
+						success: function(res) {
+							// 通过eventChannel向被打开页面传送数据
+							res.eventChannel.emit('previewObj', item);
+						}
+					});
+				// #endif
 			},
 			addImgGridAction() {
 				this.imgAction();

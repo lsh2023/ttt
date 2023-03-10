@@ -1,6 +1,7 @@
 <template>
 	<view>
 		<view class="sticky house-header">
+			<view class="status-bar" :style="statusBarStyle"></view>
 			<uni-nav-bar left-icon="left" height="88rpx" @clickLeft="backAction" @clickRight="mapAction" :border="false">
 				<view class="input-view" slot="default">
 					<input confirm-type="search" class="nav-bar-input" type="text" placeholder="输入搜索关键词"
@@ -72,6 +73,7 @@
 				horizontal: 'right',
 				vertical: 'bottom',
 				direction: 'vertical',
+				statusBarStyle:'',
 			}
 		},
 		// 下拉刷新
@@ -93,6 +95,10 @@
 				this.pageIndex2++ ;
 				this.rentListReq();
 			}
+		},
+		created() {
+			const systemInfo = uni.getSystemInfoSync();
+			this.statusBarStyle = 'height:' + systemInfo.statusBarHeight + 'px';
 		},
 		onLoad() {
 			this.saleListReq();

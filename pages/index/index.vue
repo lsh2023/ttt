@@ -51,7 +51,8 @@
 		onShow() {
 			let tokenInvalid = uni.getStorageSync('tokenInvalid');
 			if (!this.util.isNullVal(tokenInvalid) && tokenInvalid) {
-				uni.removeStorageSync('authorization');
+				uni.removeStorageSync('auth');
+				uni.removeStorageSync('imgAuth')
 				uni.removeStorageSync('loginInfo');
 				uni.removeStorageSync('empInfo');
 				this.tokenLogin();
@@ -98,7 +99,6 @@
 				}).then((res) => {
 					var data = res.data.data;
 					uni.setStorageSync('empInfo',data);
-					// that.houseNav();
 				})
 			},
 			tokenLogin() {
@@ -110,8 +110,10 @@
 							that.empInfoReq();
 						});
 					});
-				}else {
-					// this.houseNav();
+				}
+				let imgToken = uni.getStorageSync('imgAuth');
+				if (this.util.isNullVal(imgToken)) {
+					this.httpApi.imgTokenReq().then(()=>{});
 				}
 			}
 			
