@@ -8,8 +8,8 @@ var request = function(obj) {
 				obj.url = url.replace('/api/','https://dingdang.danxia.com/');
 			}else if (url.indexOf('/apixm/') >=0) {
 				obj.url = url.replace('/apixm/','https://dingdang.danxia.com/xm/')
-			}else if (url.indexOf('/img/') >= 0) {
-				obj.url = url.replace('/img/','https://sysimg.danxia.com/');
+			}else if (url.indexOf('/simg/') >= 0) {
+				obj.url = url.replace('/simg/','https://sysimg.danxia.com/');
 			}
 		// #endif
 	}
@@ -50,6 +50,7 @@ var request = function(obj) {
 }
 
 var upload = function(obj) {
+	console.log(obj);
 	return new Promise((resolve, reject) => {
 		uni.showLoading({
 			title: '上传中...',
@@ -61,6 +62,7 @@ var upload = function(obj) {
 			name: obj.name,
 			formData:obj.formData,
 			header:obj.header,
+			files:obj.files,
 			success: (res) => {
 				console.log(res);
 				uni.hideLoading();
@@ -127,7 +129,7 @@ var imgTokenReq = function() {
 	let that = this;
 	return new Promise((resolve, reject) => {
 		that.request({
-			url: '/img/token',
+			url: '/simg/token',
 			header: {
 				Authorization: 'Basic ZGluZ2RhbmdzeXNpbWcuZGFueGlhLmNvbTpCNzYyNjEwRjQ0RUQ0QUE3OEY3QUUxM0M1NzI1NEI1Rg==',
 				'content-type': 'application/x-www-form-urlencoded',

@@ -14,19 +14,22 @@
 			</uni-row>
 		</view>
 		<lsj-upload ref="upload" width="100%" height="80rpx" 
+		childId="upload-cid"
+		:instantly="true"
 		:debug="true" 
-		:instantly="false" 
 		:formats="formats"
 		:count="maxfile"
-		:option="{}"
+		:option="option"
 		@change="uploadChange"
-		childId="upload-cid"
+		@progress="uploadProgress"
+		@uploadEnd="uploadEnd"
 		>
 		</lsj-upload>
 	</view>
 </template>
 
 <script>
+import { isNullVal } from '../../common/util';
 	export default {
 		name:"sh-upload",
 		props:{
@@ -41,7 +44,7 @@
 		},
 		data() {
 			return {
-				items: null,
+				items: [],
 				option:{
 					url:'',//上传接口地址
 					name:'photos',//上传接口文件key，默认为file
@@ -54,64 +57,111 @@
 			let loginInfo = uni.getStorageSync('loginInfo');
 			let imgAuth = uni.getStorageSync('imgAuth');
 			let empNo = loginInfo.empNO;
-			this.option.url = '/img/api/files/uploadmulti?empid=' + empNo + '&folder=OA&city=XM';
-			this.option.header.Authorization = imgAuth;
-			// this.$refs.upload.setData('url','/img/api/files/uploadmulti?empid=' + empNo + '&folder=OA&city=XM');
-			// this.$refs.upload.setData('header.Authorization',imgAuth);
+			this.$refs.upload.setData('url','https://sysimg.danxia.com/api/files/uploadmulti');
+			this.$refs.upload.setData('header.Authorization',imgAuth);
+			this.$refs.upload.setData('formData.empid',empNo);
+			this.$refs.upload.setData('formData.folder','OA');
+			this.$refs.upload.setData('formData.city','XM');
 		},
 		methods:{
-			uploadChange(e) {
+			uploadShow() {
 				let that = this;
-				this.items = [];
-				let uploadList = [...e.values()];
-				if (uploadList.length == 0) {
-					this.$emit('fileList',[]);
-				}else {
-					for (var i = 0;i < uploadList.length;i++) {
-						var obj = uploadList[i];
-						let fileName = obj.name;
-						let filePath = obj.path;
-						var iconUrl = '';
-						if ((fileName.indexOf('.doc') >= 0) || (fileName.indexOf('.docx') >= 0)) {
-							iconUrl = '/static/word.png';
-						}else if ((fileName.indexOf('.xls') >= 0) || (fileName.indexOf('.xlsx') >= 0)) {
-							iconUrl = '/static/excel.png';
-						}else if ((fileName.indexOf('.ppt') >= 0) || (fileName.indexOf('.pptx') >= 0)) {
-							iconUrl = '/static/ppt.png';
-						}else if (fileName.indexOf('.pdf') >= 0) {
-							iconUrl = '/static/pdf.png';
-						}else {
-							iconUrl = '/static/other.png';
-						}
-						 this.httpApi.upload({
-							 url:this.option.url,
-							 name:this.option.name,
-							 header:this.option.header,
-							 formData:this.option.formData,
-							 filePath:filePath
-						 }).then((res)=>{
-						 	 
-						 });
-						// this.items.push({
-						// 	iconUrl:iconUrl,
-						// 	fileName:fileName,
-						// 	filePath:filePath,
-						// });
-						if (i == uploadList.length - 1) {
-							 this.$nextTick(()=>{
-								that.$emit('fileList',that.items);
-							 	that.$refs.upload.show(); // 重新定位覆盖层控件
-							 });
-						}
-					}
-				}
+				this.$forceUpdate();
+				this.$nextTick(()=>{
+					that.$refs.upload.show(); // 重新定位覆盖层控件
+				});
+				
+			},
+			uploadChange(e) {
+				// let that = this;
+				// this.items = [];
+				// let uploadList = [...e.values()];
+				// if (uploadList.length == 0) {
+				// 	this.$emit('fileList',[]);
+				// }else {
+				// 	for (var i = 0;i < uploadList.length;i++) {
+				// 		var obj = uploadList[i];
+				// 		let fileName = obj.name;
+				// 		let filePath = obj.path;
+				// 		var iconUrl = '';
+				// 		if ((fileName.indexOf('.doc') >= 0) || (fileName.indexOf('.docx') >= 0)) {
+				// 			iconUrl = '/static/word.png';
+				// 		}else if ((fileName.indexOf('.xls') >= 0) || (fileName.indexOf('.xlsx') >= 0)) {
+				// 			iconUrl = '/static/excel.png';
+				// 		}else if ((fileName.indexOf('.ppt') >= 0) || (fileName.indexOf('.pptx') >= 0)) {
+				// 			iconUrl = '/static/ppt.png';
+				// 		}else if (fileName.indexOf('.pdf') >= 0) {
+				// 			iconUrl = '/static/pdf.png';
+				// 		}else {
+				// 			iconUrl = '/static/other.png';
+				// 		}
+				// 		 this.httpApi.upload({
+				// 			 url:this.option.url,
+				// 			 name:this.option.name,
+				// 			 header:this.option.header,
+				// 			 formData:this.option.formData,
+				// 			 filePath:filePath
+				// 		 }).then((res)=>{
+							 
+				// 		 });
+				// 		// this.items.push({
+				// 		// 	iconUrl:iconUrl,
+				// 		// 	fileName:fileName,
+				// 		// 	filePath:filePath,
+				// 		// });
+				// 		if (i == uploadList.length - 1) {
+				// 			 this.$nextTick(()=>{
+				// 				that.$emit('fileList',that.items);
+				// 				that.$refs.upload.show(); // 重新定位覆盖层控件
+				// 			 });
+				// 		}
+				// 	}
+				// }
 			},
 			deleteAction (item,index) {
-				this.$refs['upload'].clear(item.fileName);
+				debugger
+				// this.items.splice(index,1);
+				// this.$emit('fileList',this.items);
 			},
 			previewAction(item,index) {
 				console.log('预览按钮点击了');
 				this.$emit('preview',item);
+			},
+			uploadProgress(item) {
+				debugger
+				// if (item.type == 'success') {
+				// 	if (!this.util.isNullVal(item.responseText)) {
+				// 		let obj = JSON.parse(item.responseText);
+				// 		let filePath = item.path;
+				// 		let fileName = obj.Names[0];
+				// 		let fileUrl = ' http://sysimg.danxia.com/xm/' + obj.FileNames[0];
+				// 		console.log(fileUrl);
+				// 		// http://sysimg.danxia.com/xm/uploads/OA/202303/14/202303141119239748411819133kfcs2590.ppt
+				// 		var iconUrl = '';
+				// 		if ((fileName.indexOf('.doc') >= 0) || (fileName.indexOf('.docx') >= 0)) {
+				// 			iconUrl = '/static/word.png';
+				// 		}else if ((fileName.indexOf('.xls') >= 0) || (fileName.indexOf('.xlsx') >= 0)) {
+				// 			iconUrl = '/static/excel.png';
+				// 		}else if ((fileName.indexOf('.ppt') >= 0) || (fileName.indexOf('.pptx') >= 0)) {
+				// 			iconUrl = '/static/ppt.png';
+				// 		}else if (fileName.indexOf('.pdf') >= 0) {
+				// 			iconUrl = '/static/pdf.png';
+				// 		}else {
+				// 			iconUrl = '/static/other.png';
+				// 		}
+				// 		this.items.push({
+				// 			iconUrl:iconUrl,
+				// 			fileName:fileName,
+				// 			filePath:filePath,
+				// 			fileUrl:fileUrl
+				// 		});
+				// 	}
+				// } 
+			},
+			uploadEnd(item) {
+				debugger
+				// this.$emit('fileList',this.items);
+				// this.uploadShow();
 			}
 		}
 	}

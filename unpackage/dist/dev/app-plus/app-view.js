@@ -6327,6 +6327,12 @@ var render = function () {
           change: function ($event) {
             return _vm.$handleViewEvent($event)
           },
+          progress: function ($event) {
+            return _vm.$handleViewEvent($event)
+          },
+          uploadEnd: function ($event) {
+            return _vm.$handleViewEvent($event)
+          },
         },
       }),
     ],

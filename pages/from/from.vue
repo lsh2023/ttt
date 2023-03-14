@@ -185,7 +185,7 @@
 					console.log(item.filePath);
 					
 					uni.downloadFile({
-						url: 'http://sysimg.danxia.com/xm/uploads/OA/202303/07/202303071542559495972586291kfcs2590.pdf',
+						url: item.fileUrl,
 						success: function (res) {
 							var filePath = res.tempFilePath;
 							console.log(filePath);

@@ -86,8 +86,14 @@
 				        "^/apixm": ""
 				    }
 				},
-				"img": {
+				"simg": {
 				    "target": "https://sysimg.danxia.com",
+				    "pathRewrite": {
+				        "^/simg": ""
+				    }
+				},
+				"imgapi": {
+				    "target": "https://sysimg.danxia.com/api",
 				    "pathRewrite": {
 				        "^/img": ""
 				    }
